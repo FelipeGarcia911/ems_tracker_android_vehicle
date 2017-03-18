@@ -1,10 +1,13 @@
 package co.original.codigo.ems_tracker;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -12,11 +15,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.List;
 
-    @Override
+import co.original.codigo.ems_tracker.helpers.PermissionsHelper;
+import co.original.codigo.ems_tracker.services.GPSService;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private PermissionsHelper permissionsHelper;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -33,13 +43,32 @@ public class MainActivity extends AppCompatActivity
         });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-            this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        initializeSingletons();
+        initGPSLocation();
+    }
+
+    private void initGPSLocation() {
+        if (permissionsHelper.isShowPermissionRequired()){
+            if (permissionsHelper.isGPSPermissionsGranted()) {
+                startGPSService();
+            }else{
+                requireGPSPermissions();
+            }
+        }else{
+            startGPSService();
+        }
+    }
+
+    private void startGPSService(){
+        Intent gpsService = new Intent(this, GPSService.class);
+        startService(gpsService);
     }
 
     @Override
@@ -97,5 +126,31 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void initializeSingletons(){
+        permissionsHelper = PermissionsHelper.getInstance();
+        permissionsHelper.initialize(this);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void requireGPSPermissions(){
+        List<String> listPermissionRequired = permissionsHelper.getListGPSPermissionRequired();
+        if (listPermissionRequired.size() > 0) {
+            String[] permission = listPermissionRequired.toArray(new String[0]);
+            requestPermissions(permission,PermissionsHelper.GPS_PERMISSIONS);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == permissionsHelper.GPS_PERMISSIONS){
+            if (permissionsHelper.isGPSPermissionsGranted()) {
+                startGPSService();
+            }else{
+                Toast.makeText(this,"Rastreo GPS no Iniciado!!",Toast.LENGTH_LONG).show();
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
