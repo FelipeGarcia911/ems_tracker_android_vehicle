@@ -1,4 +1,4 @@
-package co.original.codigo.ems_tracker;
+package co.original.codigo.ems_tracker.main.view;
 
 import android.content.Intent;
 import android.os.Build;
@@ -20,8 +20,9 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import co.original.codigo.ems_tracker.R;
 import co.original.codigo.ems_tracker.helpers.PermissionsHelper;
-import co.original.codigo.ems_tracker.services.GPSService;
+import co.original.codigo.ems_tracker.services.TrackingService;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void startGPSService(){
-        Intent gpsService = new Intent(this, GPSService.class);
+        Intent gpsService = new Intent(this, TrackingService.class);
         startService(gpsService);
     }
 
@@ -109,13 +110,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_home) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_gps) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_login) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_logout) {
 
         } else if (id == R.id.nav_share) {
 

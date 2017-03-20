@@ -5,14 +5,14 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 
-import co.original.codigo.ems_tracker.helpers.LocalStorage.VehicleLocalStorage;
+import co.original.codigo.ems_tracker.helpers.Contansts;
 import co.original.codigo.ems_tracker.helpers.LocationHelper;
-import co.original.codigo.ems_tracker.objects.Contansts;
-import co.original.codigo.ems_tracker.objects.VehicleObject;
+import co.original.codigo.ems_tracker.helpers.localStorage.VehicleLocalStorage;
+import co.original.codigo.ems_tracker.models.VehicleObject;
 
-public class GPSService extends Service {
+public class TrackingService extends Service {
+
     private Handler handler;
     private LocationHelper locationHelper;
     private ServiceRepository serviceRepository;
@@ -20,7 +20,7 @@ public class GPSService extends Service {
 
     private String TAG = "LocationHelper";
 
-    public GPSService() {
+    public TrackingService() {
         serviceRepository = new ServiceRepositoryImp();
         vehicleLocalStorage = VehicleLocalStorage.getInstance();
     }
@@ -49,9 +49,6 @@ public class GPSService extends Service {
             if (lastKnownLocation != null){
                 String latitude = String.valueOf(lastKnownLocation.getLatitude());
                 String longitude = String.valueOf(lastKnownLocation.getLongitude());
-                Log.i("GPS",latitude+" -- "+longitude);
-            }else {
-                Log.i("GPS","Null Position");
             }
             handler.postDelayed(runnableGPSTracker, Contansts.GPS_TIME_UPDATE);
         }
@@ -67,6 +64,5 @@ public class GPSService extends Service {
         VehicleObject vehicleData = vehicleLocalStorage.getVehicle();
         vehicleData.setLatitude(latitude);
         vehicleData.setLongitude(longitude);
-
     }
 }

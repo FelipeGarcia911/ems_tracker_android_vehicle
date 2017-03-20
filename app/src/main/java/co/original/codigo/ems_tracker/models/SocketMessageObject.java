@@ -1,8 +1,8 @@
-package co.original.codigo.ems_tracker.objects;
+package co.original.codigo.ems_tracker.models;
 
 import co.original.codigo.ems_tracker.helpers.GSONHelper;
 
-public class SocketMsgTemplate{
+public class SocketMessageObject {
 
     private String method;
     private String data;
@@ -12,7 +12,7 @@ public class SocketMsgTemplate{
 
     private GSONHelper gsonHelper;
 
-    public SocketMsgTemplate() {
+    public SocketMessageObject() {
         gsonHelper = new GSONHelper();
     }
 

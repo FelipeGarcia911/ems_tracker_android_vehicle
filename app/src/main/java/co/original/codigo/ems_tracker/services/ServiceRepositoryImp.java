@@ -1,8 +1,9 @@
 package co.original.codigo.ems_tracker.services;
 
-import co.original.codigo.ems_tracker.socket_io.SocketConnection;
+import co.original.codigo.ems_tracker.helpers.socket_io.SocketConnection;
 
 public class ServiceRepositoryImp implements ServiceRepository {
+
     private SocketConnection socketConnection;
 
     public ServiceRepositoryImp() {

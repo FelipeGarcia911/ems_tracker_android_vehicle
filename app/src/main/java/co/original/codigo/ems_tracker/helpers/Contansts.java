@@ -1,4 +1,4 @@
-package co.original.codigo.ems_tracker.objects;
+package co.original.codigo.ems_tracker.helpers;
 
 public class Contansts {
 

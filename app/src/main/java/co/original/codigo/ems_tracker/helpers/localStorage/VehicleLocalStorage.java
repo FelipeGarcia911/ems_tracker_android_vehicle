@@ -1,11 +1,11 @@
-package co.original.codigo.ems_tracker.helpers.LocalStorage;
+package co.original.codigo.ems_tracker.helpers.localStorage;
 
 import android.util.Log;
 
 import com.google.gson.Gson;
 
 import co.original.codigo.ems_tracker.helpers.SharedPreferencesHelper;
-import co.original.codigo.ems_tracker.objects.VehicleObject;
+import co.original.codigo.ems_tracker.models.VehicleObject;
 
 public class VehicleLocalStorage {
 

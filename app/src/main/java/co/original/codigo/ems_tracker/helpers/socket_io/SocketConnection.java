@@ -1,8 +1,8 @@
-package co.original.codigo.ems_tracker.socket_io;
+package co.original.codigo.ems_tracker.helpers.socket_io;
 
 import java.net.URISyntaxException;
 
-import co.original.codigo.ems_tracker.objects.Contansts;
+import co.original.codigo.ems_tracker.helpers.Contansts;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 
