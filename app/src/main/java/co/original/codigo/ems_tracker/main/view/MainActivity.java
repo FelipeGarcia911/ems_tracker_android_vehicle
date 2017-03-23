@@ -5,9 +5,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,16 +16,36 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import java.util.List;
 
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import co.original.codigo.ems_tracker.R;
+import co.original.codigo.ems_tracker.about.AboutFragment;
+import co.original.codigo.ems_tracker.gps.GPSFragment;
 import co.original.codigo.ems_tracker.helpers.PermissionsHelper;
-import co.original.codigo.ems_tracker.services.TrackingService;
+import co.original.codigo.ems_tracker.home.view.HomeFragment;
+import co.original.codigo.ems_tracker.main.presenter.MainPresenter;
+import co.original.codigo.ems_tracker.main.presenter.MainPresenterImp;
+import co.original.codigo.ems_tracker.services.service.GPSTrackingService;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements MainActivityView, NavigationView.OnNavigationItemSelectedListener {
+
+    private MainPresenter presenter;
+    private FragmentManager fragmentManager;
+
+    private NavigationView navigationView;
+
+    private Fragment homeFragment;
+    private Fragment gpsFragment;
+    private Fragment aboutFragment;
+    private Fragment currentFragment;
+
+    private Unbinder unbinder;
+
+    private Intent gpsTrackingService;
 
     private PermissionsHelper permissionsHelper;
 
@@ -34,28 +55,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        initClasses();
         initializeSingletons();
-        initGPSLocation();
+        initFragments();
+        initPresenter();
     }
 
-    private void initGPSLocation() {
+    //----------------------------------------------------------------------------------------------
+
+    private void initPresenter(){
+        presenter = new MainPresenterImp(this);
+        presenter.onCreate();
+    }
+
+    private void initFragments() {
+        homeFragment = HomeFragment.newInstance();
+        gpsFragment = GPSFragment.newInstance();
+        aboutFragment = AboutFragment.newInstance();
+    }
+
+    private void initClasses(){
+        unbinder = ButterKnife.bind(this);
+        fragmentManager = getSupportFragmentManager();
+    }
+
+    private void initializeSingletons(){
+        permissionsHelper = PermissionsHelper.getInstance();
+        permissionsHelper.initialize(this);
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    @Override
+    public void startGPSTrackingService() {
         if (permissionsHelper.isShowPermissionRequired()){
             if (permissionsHelper.isGPSPermissionsGranted()) {
                 startGPSService();
@@ -67,10 +107,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void startGPSService(){
-        Intent gpsService = new Intent(this, TrackingService.class);
-        startService(gpsService);
+    @Override
+    public void stopGPSTrackingService() {
+        if (gpsTrackingService != null){
+            stopService(gpsTrackingService);
+        }
     }
+
+    private void startGPSService(){
+        gpsTrackingService = new Intent(this, GPSTrackingService.class);
+        startService(gpsTrackingService);
+    }
+
+    //----------------------------------------------------------------------------------------------
 
     @Override
     public void onBackPressed() {
@@ -107,32 +156,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
-
         if (id == R.id.nav_home) {
-            // Handle the camera action
+            presenter.onNavToHomeButtonClick();
         } else if (id == R.id.nav_gps) {
-
-        } else if (id == R.id.nav_login) {
-
+            presenter.onNavToGPSButtonClick();
         } else if (id == R.id.nav_logout) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+            presenter.onLogoutButtonClick();
+        } else if (id == R.id.nav_about) {
+            presenter.onNavToAboutButtonClick();
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    private void initializeSingletons(){
-        permissionsHelper = PermissionsHelper.getInstance();
-        permissionsHelper.initialize(this);
+    //----------------------------------------------------------------------------------------------
+
+    @Override
+    public void goToHomeFragment() {
+        executeFragmentTransaction(homeFragment, HomeFragment.FRAGMENT_NAME);
+        navigationView.setCheckedItem(R.id.nav_home);
+        setTitle(HomeFragment.FRAGMENT_NAME);
     }
+
+    @Override
+    public void goToGPSFragment() {
+        executeFragmentTransaction(gpsFragment,GPSFragment.FRAGMENT_NAME);
+        navigationView.setCheckedItem(R.id.nav_gps);
+        setTitle(GPSFragment.FRAGMENT_NAME);
+    }
+
+    @Override
+    public void goToAboutFragment() {
+        executeFragmentTransaction(gpsFragment,GPSFragment.FRAGMENT_NAME);
+        navigationView.setCheckedItem(R.id.nav_about);
+        setTitle(GPSFragment.FRAGMENT_NAME);
+    }
+
+    private void executeFragmentTransaction(final Fragment fragment, final String fragmentName){
+        fragmentManager.beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                .replace(R.id.container_all, fragment, fragmentName)
+                .commit();
+        fragmentManager.executePendingTransactions();
+    }
+
+    //----------------------------------------------------------------------------------------------
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void requireGPSPermissions(){
@@ -154,4 +224,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
+    //----------------------------------------------------------------------------------------------
+
 }

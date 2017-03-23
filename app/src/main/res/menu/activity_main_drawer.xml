@@ -11,10 +11,6 @@
             android:icon="@drawable/ic_gps_fixed_black_24dp"
             android:title="GPS" />
         <item
-            android:id="@+id/nav_login"
-            android:icon="@drawable/ic_assignment_ind_black_24dp"
-            android:title="Iniciar Sesión" />
-        <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_assignment_return_black_24dp"
             android:title="Cerrar Sesión" />
@@ -23,13 +19,8 @@
     <item android:title="Información">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Términos y Condiciones" />
-
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_info_outline_black_24dp"
                 android:title="Acerce de" />
         </menu>
     </item>

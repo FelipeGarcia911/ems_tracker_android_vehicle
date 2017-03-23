@@ -7,6 +7,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 
 public class SocketConnection {
+
     private Socket socket;
 
     private static class SingletonHolder {
@@ -17,9 +18,19 @@ public class SocketConnection {
         return SocketConnection.SingletonHolder.INSTANCE;
     }
 
-    public void initSocketConn() throws URISyntaxException {
-        socket = IO.socket(Contansts.URL_SOCKET_CONN);
-        socket.connect();
+    public boolean initSocketConn() {
+        try {
+            socket = IO.socket(Contansts.URL_SOCKET_CONN);
+            socket.connect();
+            return true;
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Socket getSocket() {
+        return socket;
     }
 
     public boolean emitSocketMessage(String socketMethod, String data){

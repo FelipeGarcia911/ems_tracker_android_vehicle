@@ -8,23 +8,47 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import co.original.codigo.ems_tracker.R;
+import co.original.codigo.ems_tracker.helpers.Contansts;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements HomeFragmentView{
 
+    public static final String FRAGMENT_NAME = Contansts.HOME_FRAGMENT_NAME;
 
     public HomeFragment() {
         // Required empty public constructor
     }
 
+    public static HomeFragment newInstance() {
+        return new HomeFragment();
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
+    @Override
+    public void updateLocationText(String string) {
+
+    }
+
+    @Override
+    public void updateLongitudeText(String string) {
+
+    }
+
+    @Override
+    public void updateConnStatusText(String string) {
+
+    }
+
+    @Override
+    public void updateConnStatusColor(String color) {
+
+    }
 }

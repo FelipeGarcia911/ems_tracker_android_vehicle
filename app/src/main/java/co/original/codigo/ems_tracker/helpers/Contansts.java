@@ -13,4 +13,8 @@ public class Contansts {
     public static final String LOGIN_VEHICLE = "";
     public static final String LOGOUT_VEHICLE = "";
 
+    // Fragment Names
+    public static final String HOME_FRAGMENT_NAME = "Home";
+    public static final String GPS_FRAGMENT_NAME = "GPS Tracker";
+    public static final String ABOUT_FRAGMENT = "Acerca de";
 }

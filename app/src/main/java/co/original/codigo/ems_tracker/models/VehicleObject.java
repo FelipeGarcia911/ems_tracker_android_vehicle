@@ -5,8 +5,8 @@ public class VehicleObject {
     private String id;
     private String name;
     private String description;
-    private String latitude;
-    private String longitude;
+    private String currentLatitude;
+    private String currentLongitude;
     private String speed;
     private String lasTimeUpdate;
 
@@ -34,20 +34,20 @@ public class VehicleObject {
         this.description = description;
     }
 
-    public String getLatitude() {
-        return latitude;
+    public String getCurrentLatitude() {
+        return currentLatitude;
     }
 
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
+    public void setCurrentLatitude(String currentLatitude) {
+        this.currentLatitude = currentLatitude;
     }
 
-    public String getLongitude() {
-        return longitude;
+    public String getCurrentLongitude() {
+        return currentLongitude;
     }
 
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
+    public void setCurrentLongitude(String currentLongitude) {
+        this.currentLongitude = currentLongitude;
     }
 
     public String getSpeed() {

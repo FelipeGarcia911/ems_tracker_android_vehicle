@@ -1,4 +1,4 @@
-package co.original.codigo.ems_tracker.services;
+package co.original.codigo.ems_tracker.services.service;
 
 import android.app.Service;
 import android.content.Intent;
@@ -8,21 +8,22 @@ import android.os.IBinder;
 
 import co.original.codigo.ems_tracker.helpers.Contansts;
 import co.original.codigo.ems_tracker.helpers.LocationHelper;
-import co.original.codigo.ems_tracker.helpers.localStorage.VehicleLocalStorage;
-import co.original.codigo.ems_tracker.models.VehicleObject;
+import co.original.codigo.ems_tracker.services.interactor.GPSTrackingInteractor;
+import co.original.codigo.ems_tracker.services.interactor.GPSTrackingInteractorImp;
 
-public class TrackingService extends Service {
+public class GPSTrackingService extends Service {
 
     private Handler handler;
     private LocationHelper locationHelper;
-    private ServiceRepository serviceRepository;
-    private VehicleLocalStorage vehicleLocalStorage;
+    private GPSTrackingInteractor interactor;
+
+    private String currentLatitude;
+    private String currentLongitude;
 
     private String TAG = "LocationHelper";
 
-    public TrackingService() {
-        serviceRepository = new ServiceRepositoryImp();
-        vehicleLocalStorage = VehicleLocalStorage.getInstance();
+    public GPSTrackingService() {
+        interactor = new GPSTrackingInteractorImp();
     }
 
     @Override
@@ -47,8 +48,9 @@ public class TrackingService extends Service {
         public void run() {
             Location lastKnownLocation = locationHelper.getLastKnownLocation();
             if (lastKnownLocation != null){
-                String latitude = String.valueOf(lastKnownLocation.getLatitude());
-                String longitude = String.valueOf(lastKnownLocation.getLongitude());
+                currentLatitude = String.valueOf(lastKnownLocation.getLatitude());
+                currentLongitude = String.valueOf(lastKnownLocation.getLongitude());
+                interactor.updateGPSPosition(currentLatitude, currentLongitude);
             }
             handler.postDelayed(runnableGPSTracker, Contansts.GPS_TIME_UPDATE);
         }
@@ -58,11 +60,5 @@ public class TrackingService extends Service {
     public void onDestroy() {
         handler.removeCallbacks(runnableGPSTracker);
         super.onDestroy();
-    }
-
-    private void updateGPSPosition(String latitude, String longitude){
-        VehicleObject vehicleData = vehicleLocalStorage.getVehicle();
-        vehicleData.setLatitude(latitude);
-        vehicleData.setLongitude(longitude);
     }
 }
