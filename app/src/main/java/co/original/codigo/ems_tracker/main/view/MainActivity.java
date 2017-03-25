@@ -1,6 +1,5 @@
 package co.original.codigo.ems_tracker.main.view;
 
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,10 +25,11 @@ import co.original.codigo.ems_tracker.R;
 import co.original.codigo.ems_tracker.about.AboutFragment;
 import co.original.codigo.ems_tracker.gps.GPSFragment;
 import co.original.codigo.ems_tracker.helpers.PermissionsHelper;
+import co.original.codigo.ems_tracker.helpers.localStorage.SharedPreferencesHelper;
+import co.original.codigo.ems_tracker.helpers.localStorage.VehicleLocalStorage;
 import co.original.codigo.ems_tracker.home.view.HomeFragment;
 import co.original.codigo.ems_tracker.main.presenter.MainPresenter;
 import co.original.codigo.ems_tracker.main.presenter.MainPresenterImp;
-import co.original.codigo.ems_tracker.services.service.GPSTrackingService;
 
 public class MainActivity extends AppCompatActivity implements MainActivityView, NavigationView.OnNavigationItemSelectedListener {
 
@@ -38,14 +38,15 @@ public class MainActivity extends AppCompatActivity implements MainActivityView,
 
     private NavigationView navigationView;
 
+    private VehicleLocalStorage vehicleLocalStorage;
+    private SharedPreferencesHelper sharedPreferencesHelper;
+
     private Fragment homeFragment;
     private Fragment gpsFragment;
     private Fragment aboutFragment;
     private Fragment currentFragment;
 
     private Unbinder unbinder;
-
-    private Intent gpsTrackingService;
 
     private PermissionsHelper permissionsHelper;
 
@@ -88,35 +89,31 @@ public class MainActivity extends AppCompatActivity implements MainActivityView,
     }
 
     private void initializeSingletons(){
+        sharedPreferencesHelper = SharedPreferencesHelper.getInstance();
+        sharedPreferencesHelper.initialize(this);
+
+        vehicleLocalStorage = VehicleLocalStorage.getInstance();
+        vehicleLocalStorage.initialize();
+
         permissionsHelper = PermissionsHelper.getInstance();
         permissionsHelper.initialize(this);
+
+
     }
 
     //----------------------------------------------------------------------------------------------
 
     @Override
-    public void startGPSTrackingService() {
+    public void checkGPSPermissions() {
         if (permissionsHelper.isShowPermissionRequired()){
             if (permissionsHelper.isGPSPermissionsGranted()) {
-                startGPSService();
+                presenter.isGPSPermissionsGranted();
             }else{
                 requireGPSPermissions();
             }
         }else{
-            startGPSService();
+            presenter.isGPSPermissionsGranted();
         }
-    }
-
-    @Override
-    public void stopGPSTrackingService() {
-        if (gpsTrackingService != null){
-            stopService(gpsTrackingService);
-        }
-    }
-
-    private void startGPSService(){
-        gpsTrackingService = new Intent(this, GPSTrackingService.class);
-        startService(gpsTrackingService);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -217,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityView,
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == permissionsHelper.GPS_PERMISSIONS){
             if (permissionsHelper.isGPSPermissionsGranted()) {
-                startGPSService();
+                presenter.isGPSPermissionsGranted();
             }else{
                 Toast.makeText(this,"Rastreo GPS no Iniciado!!",Toast.LENGTH_LONG).show();
             }

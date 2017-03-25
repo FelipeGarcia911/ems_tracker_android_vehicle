@@ -1,4 +1,4 @@
-package co.original.codigo.ems_tracker.helpers.EventBus;
+package co.original.codigo.ems_tracker.helpers.eventBus;
 
 public class GreenRobotEventBus implements EventBus {
     final org.greenrobot.eventbus.EventBus eventBus;

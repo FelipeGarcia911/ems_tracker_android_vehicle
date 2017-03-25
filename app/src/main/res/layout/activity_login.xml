@@ -23,6 +23,7 @@
             android:layout_marginTop="10dp">
 
             <EditText
+                android:text="vehicle_user"
                 android:id="@+id/inputUser"
                 android:maxLines="1"
                 android:inputType="textEmailAddress"
@@ -40,6 +41,7 @@
             android:layout_centerHorizontal="true">
 
             <EditText
+                android:text="vehicle_password"
                 android:id="@+id/inputPassword"
                 android:maxLines="1"
                 android:inputType="textPassword"

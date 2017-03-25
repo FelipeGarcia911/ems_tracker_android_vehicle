@@ -11,4 +11,6 @@ public interface MainPresenter {
     void onNavToAboutButtonClick();
 
     void onCreate();
+
+    void isGPSPermissionsGranted();
 }

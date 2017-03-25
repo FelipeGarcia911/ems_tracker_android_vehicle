@@ -1,13 +1,17 @@
 package co.original.codigo.ems_tracker.main.presenter;
 
+import co.original.codigo.ems_tracker.main.interactor.MainInteractor;
+import co.original.codigo.ems_tracker.main.interactor.MainInteractorImp;
 import co.original.codigo.ems_tracker.main.view.MainActivity;
 
 public class MainPresenterImp implements MainPresenter {
 
     private final MainActivity view;
+    private MainInteractor interactor;
 
     public MainPresenterImp(MainActivity view) {
         this.view = view;
+        this.interactor = new MainInteractorImp();
     }
 
     @Override
@@ -27,7 +31,7 @@ public class MainPresenterImp implements MainPresenter {
     @Override
     public void onLogoutButtonClick() {
         if (view != null){
-            view.stopGPSTrackingService();
+            interactor.logoutAction(view);
         }
     }
 
@@ -42,7 +46,14 @@ public class MainPresenterImp implements MainPresenter {
     public void onCreate() {
         if (view != null){
             view.goToHomeFragment();
-            view.startGPSTrackingService();
+            view.checkGPSPermissions();
+        }
+    }
+
+    @Override
+    public void isGPSPermissionsGranted() {
+        if (view != null){
+            interactor.startGPSLocation(view);
         }
     }
 }

@@ -1,4 +1,4 @@
-package co.original.codigo.ems_tracker.helpers;
+package co.original.codigo.ems_tracker.helpers.localStorage;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 public class SharedPreferencesHelper {
 
     private SharedPreferences sharedPreferences;
+    private String SHARED_PREFERENCES_NAME = "SHARED_PREFERENCES";
 
     private static class SingletonHolder {
         private static final SharedPreferencesHelper INSTANCE = new SharedPreferencesHelper();
@@ -17,7 +18,7 @@ public class SharedPreferencesHelper {
     }
 
     public void initialize(Activity activity){
-        this.sharedPreferences = activity.getPreferences(Context.MODE_PRIVATE);
+        this.sharedPreferences = activity.getSharedPreferences(SHARED_PREFERENCES_NAME,Context.MODE_MULTI_PROCESS);
     }
 
     public void write(String key, String value){

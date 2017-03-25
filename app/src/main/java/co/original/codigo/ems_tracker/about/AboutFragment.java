@@ -8,11 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import co.original.codigo.ems_tracker.R;
-import co.original.codigo.ems_tracker.helpers.Contansts;
+import co.original.codigo.ems_tracker.helpers.Constants;
 
 public class AboutFragment extends Fragment {
 
-    public static final String FRAGMENT_NAME = Contansts.ABOUT_FRAGMENT;
+    public static final String FRAGMENT_NAME = Constants.ABOUT_FRAGMENT;
 
     public AboutFragment() {
         // Required empty public constructor

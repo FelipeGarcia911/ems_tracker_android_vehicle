@@ -14,11 +14,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import co.original.codigo.ems_tracker.R;
-import co.original.codigo.ems_tracker.helpers.Contansts;
+import co.original.codigo.ems_tracker.helpers.Constants;
 
 public class GPSFragment extends Fragment implements OnMapReadyCallback{
 
-    public static final String FRAGMENT_NAME = Contansts.GPS_FRAGMENT_NAME;
+    public static final String FRAGMENT_NAME = Constants.GPS_FRAGMENT_NAME;
 
     private GoogleMap mMap;
     private Unbinder unbinder;

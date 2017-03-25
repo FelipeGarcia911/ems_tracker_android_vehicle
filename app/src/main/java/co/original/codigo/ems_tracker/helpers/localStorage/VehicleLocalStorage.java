@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
-import co.original.codigo.ems_tracker.helpers.SharedPreferencesHelper;
 import co.original.codigo.ems_tracker.models.VehicleObject;
 
 public class VehicleLocalStorage {
@@ -28,7 +27,7 @@ public class VehicleLocalStorage {
         this.preferencesHelper = SharedPreferencesHelper.getInstance();
     }
 
-    public void setUser(VehicleObject vehicleObject){
+    public void setVehicle(VehicleObject vehicleObject){
         String gsonString = gson.toJson(vehicleObject);
         preferencesHelper.write(VEHICLE_KEY,gsonString);
         saveUserTime();

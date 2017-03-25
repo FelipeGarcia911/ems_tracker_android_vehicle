@@ -14,6 +14,8 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import co.original.codigo.ems_tracker.R;
 import co.original.codigo.ems_tracker.helpers.SimpleProgressDialogHelper;
+import co.original.codigo.ems_tracker.helpers.localStorage.SharedPreferencesHelper;
+import co.original.codigo.ems_tracker.helpers.localStorage.VehicleLocalStorage;
 import co.original.codigo.ems_tracker.login.presenter.LoginPresenter;
 import co.original.codigo.ems_tracker.login.presenter.LoginPresenterImp;
 import co.original.codigo.ems_tracker.main.view.MainActivity;
@@ -23,6 +25,9 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVie
     private Unbinder unbinder;
     private LoginPresenter presenter;
     private SimpleProgressDialogHelper progressDialogHelper;
+
+    private VehicleLocalStorage vehicleLocalStorage;
+    private SharedPreferencesHelper sharedPreferencesHelper;
 
     @BindView(R.id.signUpButton) Button signUpButton;
 
@@ -36,8 +41,20 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         initInterface();
+        initSingletons();
         initClasses();
+
+        presenter.onCreate();
+    }
+
+    private void initSingletons() {
+        sharedPreferencesHelper = SharedPreferencesHelper.getInstance();
+        sharedPreferencesHelper.initialize(this);
+
+        vehicleLocalStorage = VehicleLocalStorage.getInstance();
+        vehicleLocalStorage.initialize();
     }
 
     private void initInterface(){
@@ -123,4 +140,11 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVie
     }
 
     //----------------------------------------------------------------------------------------------
+
+
+    @Override
+    protected void onDestroy() {
+        presenter.onDestroy();
+        super.onDestroy();
+    }
 }

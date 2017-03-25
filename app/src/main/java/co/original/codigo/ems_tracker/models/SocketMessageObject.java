@@ -1,20 +1,15 @@
 package co.original.codigo.ems_tracker.models;
 
-import co.original.codigo.ems_tracker.helpers.GSONHelper;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SocketMessageObject {
 
     private String method;
-    private String data;
+    private JSONObject data;
     private String message;
     private String errorCode;
     private String errorMsg;
-
-    private GSONHelper gsonHelper;
-
-    public SocketMessageObject() {
-        gsonHelper = new GSONHelper();
-    }
 
     public String getMethod() {
         return method;
@@ -24,12 +19,12 @@ public class SocketMessageObject {
         this.method = method;
     }
 
-    public String getData() {
+    public JSONObject getData() {
         return data;
     }
 
-    public void setData(Object data) {
-        this.data = gsonHelper.serializeObject(data);
+    public void setData(JSONObject data) {
+        this.data = data;
     }
 
     public String getMessage() {
@@ -56,7 +51,17 @@ public class SocketMessageObject {
         this.errorMsg = errorMsg;
     }
 
-    public String serializeObject(){
-        return gsonHelper.serializeObject(this);
+    public JSONObject toJsonObject(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("method",    this.method);
+            jsonObject.put("data" ,     this.data);
+            jsonObject.put("message" ,  this.message);
+            jsonObject.put("errorCode" ,this.errorCode);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 }

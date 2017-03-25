@@ -5,6 +5,8 @@ public class VehicleObject {
     private String id;
     private String name;
     private String description;
+    private String user;
+    private String password;
     private String currentLatitude;
     private String currentLongitude;
     private String speed;
@@ -28,6 +30,22 @@ public class VehicleObject {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setDescription(String description) {

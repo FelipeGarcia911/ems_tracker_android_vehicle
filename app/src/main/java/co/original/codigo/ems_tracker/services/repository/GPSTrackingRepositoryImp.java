@@ -1,7 +1,9 @@
 package co.original.codigo.ems_tracker.services.repository;
 
+import co.original.codigo.ems_tracker.helpers.Constants;
 import co.original.codigo.ems_tracker.helpers.socket_io.SocketConnection;
 import co.original.codigo.ems_tracker.models.SocketMessageObject;
+import co.original.codigo.ems_tracker.models.TrackingGPSObject;
 import co.original.codigo.ems_tracker.services.interactor.GPSTrackingInteractor;
 import co.original.codigo.ems_tracker.services.interactor.GPSTrackingInteractorImp;
 
@@ -17,25 +19,30 @@ public class GPSTrackingRepositoryImp implements GPSTrackingRepository {
     }
 
     @Override
-    public void updateGPSPosition(SocketMessageObject socketMessageObject) {
+    public void updateGPSPosition(TrackingGPSObject trackingGPSObject) {
         if (socketConnection.isSocketConnected()){
-            boolean socketMessage = socketConnection.emitSocketMessage(socketMessageObject.getMethod(), socketMessageObject.serializeObject());
+
+            SocketMessageObject socketMessageObject = new SocketMessageObject();
+            socketMessageObject.setMethod(Constants.UPDATE_VEHICLE_POSITION_REQUEST);
+            socketMessageObject.setData(trackingGPSObject.toJsonObject());
+
+            boolean socketMessage = socketConnection.emitSocketMessage(socketMessageObject.getMethod(),socketMessageObject.toJsonObject());
             if (socketMessage){
-                onUpdateGPSPositionSuccess(socketMessageObject);
+                onUpdateGPSPositionSuccess(trackingGPSObject);
             }else{
-                onUpdateGPSPositionFailure(socketMessageObject);
+                onUpdateGPSPositionFailure(trackingGPSObject);
             }
         }else{
-            onUpdateGPSPositionFailure(socketMessageObject);
+            onUpdateGPSPositionFailure(trackingGPSObject);
         }
     }
 
-    private void onUpdateGPSPositionSuccess(SocketMessageObject socketMessageObject) {
-        interactor.onUpdateSuccess(socketMessageObject);
+    private void onUpdateGPSPositionSuccess(TrackingGPSObject trackingGPSObject) {
+        interactor.onUpdateSuccess(trackingGPSObject);
     }
 
-    private void onUpdateGPSPositionFailure(SocketMessageObject socketMessageObject) {
-        interactor.onUpdateFailure(socketMessageObject);
+    private void onUpdateGPSPositionFailure(TrackingGPSObject trackingGPSObject) {
+        interactor.onUpdateFailure(trackingGPSObject);
     }
 
 }

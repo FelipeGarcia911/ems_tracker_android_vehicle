@@ -1,50 +1,85 @@
 package co.original.codigo.ems_tracker.login.interactor;
 
-import co.original.codigo.ems_tracker.login.presenter.LoginPresenter;
+import android.content.Context;
+
+import org.greenrobot.eventbus.Subscribe;
+
+import co.original.codigo.ems_tracker.eventBusEvents.LoginEvent;
+import co.original.codigo.ems_tracker.helpers.eventBus.EventBus;
+import co.original.codigo.ems_tracker.helpers.eventBus.GreenRobotEventBus;
 import co.original.codigo.ems_tracker.login.repository.LoginRepository;
 import co.original.codigo.ems_tracker.login.repository.LoginRepositoryImp;
+import co.original.codigo.ems_tracker.models.VehicleObject;
 
 public class LoginInteractorImp implements LoginInteractor {
 
-    private LoginPresenter presenter;
-    private LoginRepository repository;
+    private EventBus eventBus;
+    private LoginRepository loginRepository;
 
-    public LoginInteractorImp(LoginPresenter presenter) {
-        this.presenter = presenter;
-        this.repository = new LoginRepositoryImp(this);
+    public LoginInteractorImp() {
+        this.loginRepository = new LoginRepositoryImp();
+        this.eventBus = GreenRobotEventBus.getInstance();
     }
 
     @Override
-    public void doLogin(String user, String password) {
-        boolean isUserValidate = false;
-        boolean isPasswordValidate = false;
-
-        if (user != null && !user.isEmpty()){
-            isUserValidate = true;
-        }else{
-            presenter.showUserError("Usuario inválido");
-        }
-
-        if (password != null && !password.isEmpty()){
-            isPasswordValidate = true;
-        }else{
-            presenter.showPasswordError("Contraseña inválida");
-        }
-
-        if (isUserValidate && isPasswordValidate){
-            presenter.cleanErrorMsgs();
-            presenter.showLoader();
-            repository.loginService(user, password);
+    public void checkVehicleLogged() {
+        VehicleObject vehicleObject = loginRepository.getVehicleObjFromLocalStorage();
+        if (vehicleObject != null){
+            onLoginSuccess(vehicleObject);
         }
     }
 
     @Override
-    public void onLoginSuccess() {
-        presenter.onLoginSuccess();
+    public void doLogin(String user, String password, Context context) {
+        loginRepository.loginVehicle(user, password, context);
     }
 
     @Override
-    public void onLoginFailure() {
-        presenter.onLoginFailure("Error iniciando sesión, intentelo de nuevo.");
+    public void doLogout(String vehicleId) {
+        loginRepository.logoutVehicle(vehicleId);
     }
+
+    @Subscribe
+    public void onLoginEvent(LoginEvent event){
+        switch (event.getEventType()){
+            case LoginEvent.ON_LOGIN_SUCCESS_INTERACTOR:
+                onLoginSuccess(event.getVehicleObject());
+                break;
+            case LoginEvent.ON_LOGIN_FAILURE_INTERACTOR:
+                onLoginFailure(event.getErrorMessage());
+        }
+    }
+
+    private void onLoginFailure(String errorMessage) {
+        LoginEvent loginEvent = new LoginEvent();
+        loginEvent.setEventType(LoginEvent.ON_LOGIN_FAILURE_PRESENTER);
+        loginEvent.setErrorMessage(errorMessage);
+        posEvent(loginEvent);
+    }
+
+    private void onLoginSuccess(VehicleObject vehicleObject) {
+        loginRepository.saveVehicleObjInLocalStorage(vehicleObject);
+
+        LoginEvent loginEvent = new LoginEvent();
+        loginEvent.setEventType(LoginEvent.ON_LOGIN_SUCCESS_PRESENTER);
+        posEvent(loginEvent);
+    }
+
+    @Override
+    public void onCreate(){
+        eventBus.register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        eventBus.unregister(this);
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------
+
+    private void posEvent(LoginEvent event){
+        eventBus.post(event);
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------
 }

@@ -1,7 +1,13 @@
 package co.original.codigo.ems_tracker.login.interactor;
 
+import android.content.Context;
+
 public interface LoginInteractor {
-    void doLogin(String user, String password);
-    void onLoginSuccess();
-    void onLoginFailure();
+
+    void checkVehicleLogged();
+    void doLogin(String user, String password, Context context);
+    void doLogout(String vehicleId);
+
+    void onCreate();
+    void onDestroy();
 }

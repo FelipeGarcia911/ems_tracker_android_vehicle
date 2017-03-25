@@ -7,6 +7,5 @@ public interface MainActivityView {
     void goToHomeFragment();
     void goToAboutFragment();
 
-    void startGPSTrackingService();
-    void stopGPSTrackingService();
+    void checkGPSPermissions();
 }

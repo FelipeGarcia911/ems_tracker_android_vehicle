@@ -6,7 +6,7 @@ import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
 
-import co.original.codigo.ems_tracker.helpers.Contansts;
+import co.original.codigo.ems_tracker.helpers.Constants;
 import co.original.codigo.ems_tracker.helpers.LocationHelper;
 import co.original.codigo.ems_tracker.services.interactor.GPSTrackingInteractor;
 import co.original.codigo.ems_tracker.services.interactor.GPSTrackingInteractorImp;
@@ -17,13 +17,19 @@ public class GPSTrackingService extends Service {
     private LocationHelper locationHelper;
     private GPSTrackingInteractor interactor;
 
+
     private String currentLatitude;
     private String currentLongitude;
 
     private String TAG = "LocationHelper";
+    public static final String VEHICLE_NAME = "VEHICLE_NAME";
+    public static final String VEHICLE_ID = "VEHICLE_ID";
+
+    private String vehicleId;
+    private String vehicleName;
 
     public GPSTrackingService() {
-        interactor = new GPSTrackingInteractorImp();
+        interactor = new GPSTrackingInteractorImp(this);
     }
 
     @Override
@@ -33,12 +39,22 @@ public class GPSTrackingService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        initRepetitiveGPSTask();
+        if (intent != null){
+            vehicleId   = intent.getStringExtra(VEHICLE_ID);
+            vehicleName = intent.getStringExtra(VEHICLE_NAME);
+            if (vehicleId != null){
+                initRepetitiveGPSTask();
+            }else{
+                onErrorLocationService("Parámetros del vehículo no indicados");
+            }
+        }else{
+            onErrorLocationService("Error de recepción de parámetros del vehículo");
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
     private void initRepetitiveGPSTask(){
-        locationHelper = new LocationHelper(getApplicationContext(), Contansts.GPS_TIME_UPDATE,Contansts.GPS_DISTANCE_UPDATE);
+        locationHelper = new LocationHelper(getApplicationContext(), Constants.GPS_TIME_UPDATE, Constants.GPS_DISTANCE_UPDATE);
         handler = new Handler();
         handler.post(runnableGPSTracker);
     }
@@ -52,7 +68,7 @@ public class GPSTrackingService extends Service {
                 currentLongitude = String.valueOf(lastKnownLocation.getLongitude());
                 interactor.updateGPSPosition(currentLatitude, currentLongitude);
             }
-            handler.postDelayed(runnableGPSTracker, Contansts.GPS_TIME_UPDATE);
+            handler.postDelayed(runnableGPSTracker, Constants.GPS_TIME_UPDATE);
         }
     };
 
@@ -61,4 +77,6 @@ public class GPSTrackingService extends Service {
         handler.removeCallbacks(runnableGPSTracker);
         super.onDestroy();
     }
+
+    private void onErrorLocationService(String errorMessage){}
 }

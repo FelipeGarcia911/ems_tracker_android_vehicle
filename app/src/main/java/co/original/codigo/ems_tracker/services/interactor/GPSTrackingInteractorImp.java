@@ -1,30 +1,26 @@
 package co.original.codigo.ems_tracker.services.interactor;
 
-import java.util.ArrayList;
-
-import co.original.codigo.ems_tracker.helpers.Contansts;
+import co.original.codigo.ems_tracker.eventBusEvents.LocationUpdateEvent;
+import co.original.codigo.ems_tracker.helpers.eventBus.EventBus;
+import co.original.codigo.ems_tracker.helpers.eventBus.GreenRobotEventBus;
 import co.original.codigo.ems_tracker.helpers.localStorage.VehicleLocalStorage;
-import co.original.codigo.ems_tracker.models.SocketMessageObject;
 import co.original.codigo.ems_tracker.models.TrackingGPSObject;
 import co.original.codigo.ems_tracker.models.VehicleObject;
 import co.original.codigo.ems_tracker.services.repository.GPSTrackingRepository;
 import co.original.codigo.ems_tracker.services.repository.GPSTrackingRepositoryImp;
 import co.original.codigo.ems_tracker.services.service.GPSTrackingService;
 
-/**
- * Created by Felipe Garcia on 22/03/2017 - 10:22 PM.
- */
-
 public class GPSTrackingInteractorImp implements GPSTrackingInteractor {
 
     private GPSTrackingRepository repository;
     private GPSTrackingService service;
-    private ArrayList<TrackingGPSObject> pendingLocations;
+    private final EventBus eventBus;
 
     private VehicleObject vehicleObject;
 
     public GPSTrackingInteractorImp(GPSTrackingService service) {
         this.service = service;
+        this.eventBus = GreenRobotEventBus.getInstance();
         this.repository = new GPSTrackingRepositoryImp(this);
         this.vehicleObject = getVehicleData();
     }
@@ -47,32 +43,17 @@ public class GPSTrackingInteractorImp implements GPSTrackingInteractor {
             trackingGPSObject.setLatitude(currentLatitude);
             trackingGPSObject.setLongitude(currentLongitude);
 
-            sendGPSPosition(trackingGPSObject);
+            repository.updateGPSPosition(trackingGPSObject);
         }
     }
 
-    private void sendGPSPosition(TrackingGPSObject trackingGPSObject) {
-        SocketMessageObject socketMessageObject = new SocketMessageObject();
-        socketMessageObject.setMethod(Contansts.PUSH_GPS_POSITION);
-        socketMessageObject.setData(trackingGPSObject);
-        repository.updateGPSPosition(socketMessageObject);
-    }
-
-    private void addPendingPositions(TrackingGPSObject gpsObject){
-        pendingLocations.add(gpsObject);
-    }
-
-    private void removePendingPosition(TrackingGPSObject gpsObject){
-        pendingLocations.remove(gpsObject);
-    }
-
     @Override
-    public void onUpdateSuccess(SocketMessageObject socketMessageObject) {
+    public void onUpdateSuccess(TrackingGPSObject socketMessageObject) {
 
     }
 
     @Override
-    public void onUpdateFailure(SocketMessageObject messageObject) {
+    public void onUpdateFailure(TrackingGPSObject messageObject) {
 
     }
 
@@ -87,5 +68,17 @@ public class GPSTrackingInteractorImp implements GPSTrackingInteractor {
 
     private boolean isVehicleObjectValid(){
         return vehicleObject != null;
+    }
+
+    private void publishUpdateLocationEvent(String latitude, String logitude){
+        LocationUpdateEvent event = new LocationUpdateEvent();
+        event.setEventType(LocationUpdateEvent.ON_LOCATION_UPDATE);
+        event.setLatitude(latitude);
+        event.setLongitude(logitude);
+        postEvent(event);
+    }
+
+    private void postEvent(Object event){
+        eventBus.post(event);
     }
 }
